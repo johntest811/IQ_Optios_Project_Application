@@ -5,6 +5,7 @@ Validated on Windows x64, 2026-10-29.
 - 99 unit/integration-fixture tests passed. Coverage includes pre-permission timeouts, post-permission uncertainty, expired signals, STOP/freshness checks, account isolation, persistent limits, reconnection, delayed settlement, malformed market data, weekend OTC availability, regime classification, chronological evaluation, login-first GUI and update integrity failures.
 - Packaged offline self-test passed: SQLite, spawned connector, patched catalogue/candle callbacks. No network or orders in that test.
 - Standalone installer successfully installed 0.4.0 in a separate per-user version directory, ran the offline check and updated shortcuts. Existing journals remain outside the installation.
+- Public release update verified end-to-end: checked GitHub latest from version 0.3.1, downloaded and SHA-256 verified 0.4.0, installed in an isolated directory, and passed offline startup. Version 0.4.0 correctly reports no newer release.
 - Executable archive inspected: no retired model client/loader/checker modules are bundled.
 - Verified the legacy pre-buy expiry defect against its journal error and original submission ordering. The affected unsent intent was repaired without changing settled trade results or risk history. Unknown timeouts are not repaired this way.
 - Adaptive-v1 has fixture tests, not profitable broker-forward evidence. No current release strategy performance claim is made. The offline evaluator is a candle proxy, not a broker-exact backtest.
