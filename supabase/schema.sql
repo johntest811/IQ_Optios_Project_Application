@@ -1,5 +1,6 @@
--- IQ Trader 0.5.0. Run in YOUR Supabase project's SQL Editor as project owner.
--- Uses Supabase Auth. Never put a service-role key in the desktop application.
+-- IQ Trader 0.6.0. Run in YOUR Supabase project's SQL Editor as project owner.
+-- Enable Anonymous Sign-Ins in Supabase Auth. No email/password needed.
+-- Never put a service-role key in the desktop application.
 -- Re-runnable; does not drop tables or erase existing data.
 begin;
 
@@ -80,8 +81,53 @@ create table if not exists public.iq_execution_owners (
   primary key (user_id,account_key)
 );
 
--- Owner-scoped access. Authenticated devices share data by using the SAME
--- Supabase user and IQ Option account. Other users cannot access these rows.
+-- Anonymous sessions receive an automatic identity. A high-entropy workspace
+-- capability links devices; the project publishable key alone grants no data.
+create table if not exists public.iq_workspaces (
+  token_hash bytea primary key,
+  owner_id uuid not null unique references auth.users(id) on delete cascade
+);
+create table if not exists public.iq_workspace_members (
+  member_id uuid primary key references auth.users(id) on delete cascade,
+  owner_id uuid not null references auth.users(id) on delete cascade
+);
+alter table public.iq_workspaces enable row level security;
+alter table public.iq_workspace_members enable row level security;
+revoke all on public.iq_workspaces,public.iq_workspace_members from public,anon,authenticated;
+
+create or replace function public.iq_data_owner() returns uuid
+language sql stable security definer set search_path = '' as $$
+  select coalesce((select owner_id from public.iq_workspace_members where member_id=auth.uid()),auth.uid());
+$$;
+revoke all on function public.iq_data_owner() from public,anon;
+grant execute on function public.iq_data_owner() to authenticated;
+
+create or replace function public.iq_join_workspace(p_token text) returns uuid
+language plpgsql security definer set search_path = '' as $$
+declare member uuid := auth.uid(); owner uuid; existing uuid; digest bytea;
+begin
+  if member is null or p_token is null or p_token !~ '^[a-f0-9]{64}$' then raise exception 'invalid workspace request'; end if;
+  digest := sha256(convert_to(p_token,'UTF8'));
+  perform pg_advisory_xact_lock(hashtextextended(member::text,1));
+  perform pg_advisory_xact_lock(hashtextextended(encode(digest,'hex'),2));
+  select owner_id into owner from public.iq_workspaces where token_hash=digest;
+  select owner_id into existing from public.iq_workspace_members where member_id=member;
+  if existing is not null then
+    if owner is distinct from existing then raise exception 'device already linked to another workspace'; end if;
+    return existing;
+  end if;
+  if owner is null then
+    owner := member;
+    insert into public.iq_workspaces(token_hash,owner_id) values(digest,owner);
+  end if;
+  insert into public.iq_workspace_members(member_id,owner_id) values(member,owner);
+  return owner;
+end $$;
+revoke all on function public.iq_join_workspace(text) from public,anon;
+grant execute on function public.iq_join_workspace(text) to authenticated;
+
+-- Workspace-scoped access. Devices with the same private workspace token
+-- share data. Other anonymous or permanent users cannot access these rows.
 do $policy$
 declare tab text;
 begin
@@ -90,16 +136,16 @@ begin
     execute format('revoke all on public.%I from anon, authenticated',tab);
     execute format('grant select on public.%I to authenticated',tab);
     execute format('drop policy if exists owner_read on public.%I',tab);
-    execute format('create policy owner_read on public.%I for select to authenticated using ((select auth.uid()) = user_id)',tab);
+    execute format('create policy owner_read on public.%I for select to authenticated using ((select public.iq_data_owner()) = user_id)',tab);
     if tab <> 'iq_execution_owners' then
       execute format('grant insert on public.%I to authenticated',tab);
       execute format('drop policy if exists owner_insert on public.%I',tab);
-      execute format('create policy owner_insert on public.%I for insert to authenticated with check ((select auth.uid()) = user_id)',tab);
+      execute format('create policy owner_insert on public.%I for insert to authenticated with check ((select public.iq_data_owner()) = user_id)',tab);
     end if;
     if tab in ('iq_trades','iq_settings') then
       execute format('grant update on public.%I to authenticated',tab);
       execute format('drop policy if exists owner_update on public.%I',tab);
-      execute format('create policy owner_update on public.%I for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id)',tab);
+      execute format('create policy owner_update on public.%I for update to authenticated using ((select public.iq_data_owner()) = user_id) with check ((select public.iq_data_owner()) = user_id)',tab);
     end if;
   end loop;
 end $policy$;
@@ -128,7 +174,7 @@ create trigger iq_trade_transition before update on public.iq_trades for each ro
 -- accept fencing tokens, so timeout-based automatic takeover would be unsafe.
 create or replace function public.iq_claim_executor(p_account_key text,p_device_id uuid) returns boolean
 language plpgsql security definer set search_path = '' as $$
-declare uid uuid := auth.uid(); owner uuid;
+declare uid uuid := public.iq_data_owner(); owner uuid;
 begin
   if uid is null or p_account_key !~ '^[a-f0-9]{64}$' or p_device_id is null then raise exception 'invalid authenticated request'; end if;
   perform pg_advisory_xact_lock(hashtextextended(uid::text || ':' || p_account_key, 0));
@@ -140,7 +186,7 @@ begin
 end $$;
 create or replace function public.iq_release_executor(p_account_key text,p_device_id uuid) returns boolean
 language plpgsql security definer set search_path = '' as $$
-declare uid uuid := auth.uid(); changed integer;
+declare uid uuid := public.iq_data_owner(); changed integer;
 begin
   if uid is null or p_account_key !~ '^[a-f0-9]{64}$' or p_device_id is null then raise exception 'invalid authenticated request'; end if;
   perform pg_advisory_xact_lock(hashtextextended(uid::text || ':' || p_account_key, 0));

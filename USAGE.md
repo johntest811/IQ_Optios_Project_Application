@@ -1,6 +1,6 @@
-# Version 0.5.0 additions
+# Version 0.6.0 additions
 
-For shared Windows data, local Supabase sign-in, training, and editable protections, follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md). Supabase SQL is in [supabase/schema.sql](supabase/schema.sql).
+For shared Windows data, automatic Supabase connection, training, and editable protections, follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md). Supabase SQL is in [supabase/schema.sql](supabase/schema.sql).
 
 # Using IQ Trader 0.4.0
 
