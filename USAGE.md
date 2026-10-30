@@ -1,3 +1,7 @@
+# Version 0.5.0 additions
+
+For shared Windows data, local Supabase sign-in, training, and editable protections, follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md). Supabase SQL is in [supabase/schema.sql](supabase/schema.sql).
+
 # Using IQ Trader 0.4.0
 
 Sign in with PRACTICE selected. Login verifies the account and starts a read-only connection monitor. Select `adaptive` or `baseline` in Strategy, check stake/currency, then Start automatic trading. Leave the app and computer running. The app can wait when there is no setup, a market is closed, a payout is insufficient or a risk limit is reached.

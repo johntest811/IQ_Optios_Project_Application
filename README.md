@@ -1,6 +1,13 @@
-# IQ Trader 0.4.0
+# IQ Trader 0.5.0
 
-Windows application for IQ Option PRACTICE trading with CPU-only, deterministic rules. No language-model service, model downloads, GPU inference or model tooling is included. Strategies are experimental, not demonstrated profitable. REAL accounts are read-only.
+Windows application for IQ Option PRACTICE trading with CPU-only rules, optional Supabase sharing, and lightweight numeric research training. No language-model service, model downloads or GPU inference is included. Strategies are experimental, not demonstrated profitable. REAL accounts are read-only.
+
+## New in 0.5.0
+
+- Edit or disable configurable risk limits in **Protections**, including the daily trade cap. Changes require Stop and Apply; journal counters are preserved.
+- Share research samples, trade history, settings and training reports across Windows computers through your own Supabase project. A persistent single-device owner coordinates cloud-enabled execution.
+- Collect prospective five-minute candle labels and automatically train small numeric models with chronological validation. The optional PRACTICE filter remains off by default; models cannot create orders or change stakes.
+- Follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md) and run [supabase/schema.sql](supabase/schema.sql). Enter connection details locally in **Shared data & training**.
 
 ## Install and start
 

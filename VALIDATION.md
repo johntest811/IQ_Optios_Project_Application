@@ -1,14 +1,13 @@
-# Validation ? IQ Trader 0.4.0
+# Validation - IQ Trader 0.5.0
 
-Validated on Windows x64, 2026-10-29.
+Validated locally on Windows x64, 2026-10-30.
 
-- 99 unit/integration-fixture tests passed. Coverage includes pre-permission timeouts, post-permission uncertainty, expired signals, STOP/freshness checks, account isolation, persistent limits, reconnection, delayed settlement, malformed market data, weekend OTC availability, regime classification, chronological evaluation, login-first GUI and update integrity failures.
-- Packaged offline self-test passed: SQLite, spawned connector, patched catalogue/candle callbacks. No network or orders in that test.
-- Standalone installer successfully installed 0.4.0 in a separate per-user version directory, ran the offline check and updated shortcuts. Existing journals remain outside the installation.
-- Public release update verified end-to-end: checked GitHub latest from version 0.3.1, downloaded and SHA-256 verified 0.4.0, installed in an isolated directory, and passed offline startup. Version 0.4.0 correctly reports no newer release.
-- Executable archive inspected: no retired model client/loader/checker modules are bundled.
-- Verified the legacy pre-buy expiry defect against its journal error and original submission ordering. The affected unsent intent was repaired without changing settled trade results or risk history. Unknown timeouts are not repaired this way.
-- Adaptive-v1 has fixture tests, not profitable broker-forward evidence. No current release strategy performance claim is made. The offline evaluator is a candle proxy, not a broker-exact backtest.
-- Live authenticated 0.4.0 PRACTICE monitoring verified after the user signed in locally. Both the account monitor and user-started adaptive scanner reported connected. The observed startup scan produced regime/availability holds with no new errors. A subsequent automatic adaptive-v1 PRACTICE submission received a broker acknowledgement and entered settlement monitoring, with no new errors in the observed run. That acknowledgement verifies submission, not profitability; long-running reliability remains unproven.
+- 109 Python tests passed, including existing order-boundary, retry, reconciliation and update-integrity coverage; new protection toggles, research labels, chronological partitions, cloud pre-submit failure, shared-history conflicts, Windows token encryption, and isolated Tk settings-save tests, literal .env parsing and the research worker CLI startup path.
+- Supabase SQL executed twice on local PostgreSQL-compatible PGlite. Checks passed for row-level user isolation, anonymous denial, persistent single-device ownership, pending-order handover blocking, and immutable settled results. This is local SQL validation, not a completed connection to the user's hosted project.
+- Packaged offline checks passed: SQLite, spawned connector and catalogue/candle callbacks, research schema, Windows DPAPI token round trip, and bundled SQL. No network or order was used by those checks.
+- Standalone installer installed 0.5.0 in a separate per-user directory and passed its offline check. Existing journals remain outside the installation. The installed login window was launched.
+- Live Supabase authentication and two-computer synchronization require the user's locally entered project details; their verification status will be recorded separately. Training eligibility and profitability have not been established with real collected data.
 
-Limitations: unofficial connector and broker availability can change; hard account/schema/integrity errors may stop execution. Temporary read failures retry automatically. Uncertain accepted orders require reconciliation. REAL automatic execution is disabled. Unsigned installer; SHA-256 integrity checks do not independently authenticate the publisher.
+Mandatory execution protections remain: account/currency validation, current valid data, broker contract availability, sufficient balance, persistent intent before submission, no unresolved/duplicate orders, and verified device ownership when cloud-enabled. REAL automatic orders remain disabled.
+
+Research labels are five-minute candle proxies, not exact broker settlements. Numeric models are experimental and cannot be described as proven profitable. Temporary connectivity failures and broker schema changes remain possible. Installer is unsigned; hashes verify integrity, not independent publisher identity.
