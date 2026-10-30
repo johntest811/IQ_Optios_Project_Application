@@ -1,6 +1,10 @@
-# IQ Trader 0.6.0
+# IQ Trader 0.6.1
 
 Windows application for IQ Option PRACTICE trading with CPU-only rules, optional Supabase sharing, and lightweight numeric research training. No language-model service, model downloads or GPU inference is included. Strategies are experimental, not demonstrated profitable. REAL accounts are read-only.
+
+## New in 0.6.1
+
+The cloud session lock waits briefly for a concurrent local worker, and submission failures now report a safe technical category. Unknown submission acknowledgements remain blocked. Broker outages still require the broker connection to recover.
 
 ## New in 0.6.0
 

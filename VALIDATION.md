@@ -1,10 +1,11 @@
-# Validation - IQ Trader 0.6.0
+# Validation - IQ Trader 0.6.1
 
 Windows x64, 2026-10-30.
 
-- 114 Python tests passed, including automatic anonymous session reuse, workspace identity checks, sharing-key generation, no-email/password .env parsing, read-only market collection without orders, tolerant broker-journal reconciliation and immutable-term sync, protection controls, order boundaries, reconciliation and update integrity.
-- The complete Supabase SQL ran twice on local PostgreSQL-compatible PGlite. Tests cover anonymous-session workspace sharing, cross-workspace read/write isolation, token-table access denial, persistent device ownership, pending-order handover blocking and immutable settled results.
-- Hosted Supabase: an automatic anonymous session joined the private workspace; existing PRACTICE journal and research samples uploaded and were read back. A second independent anonymous session joined the same workspace and read the same journal. Live RPC checks verified concurrent ownership was refused and explicit handover succeeded with a temporary test account key. No broker orders were submitted by these checks.
-- Trading strategies and trained proxy models remain experimental. Profitable performance and long-running reliability are not established. REAL automatic execution is disabled.
+- 116 Python tests passed, including bounded cloud session-lock contention, timeout behavior, secret-safe failure diagnostics, rejection before broker submission, the immutable journal, ownership, research and model validation.
+- A Windows cross-process check confirmed an authentication lock waits for the other process and then acquires the lock. A hosted Supabase diagnostic recorded an isolated synthetic intent as not sent, reconciled it, and released its temporary owner. No broker order was sent by this check.
+- IQ Option's HTTPS endpoint timed out from this computer while another public site responded; local DNS agreed with a public resolver. The exact network or broker cause is not established, and the release cannot guarantee reconnect while the broker is unavailable.
+- IQ Trader 0.6.0 had successfully synced research and journal rows on this hosted Supabase project; separate sessions were tested for shared access and exclusive ownership. See the 0.6.0 release notes for earlier verification.
+- Strategies and numeric proxy models remain experimental. Profitability, long-running uptime and an error-free system are not established. REAL automatic execution is disabled.
 
-The installer is unsigned. SHA-256 checks detect corruption, not a compromised publisher. No passwords, sharing tokens, account journals or local .env files are included in source backup or release assets.
+Installers are unsigned; SHA-256 checks detect corruption but do not prove publisher identity. Private .env values, tokens and user journals are excluded from releases and source backup.
